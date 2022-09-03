@@ -20,9 +20,9 @@ import tc.oc.pgm.api.party.Party;
 import tc.oc.pgm.api.party.event.CompetitorRemoveEvent;
 import tc.oc.pgm.api.player.MatchPlayer;
 import tc.oc.pgm.api.player.ParticipantState;
+import tc.oc.pgm.api.player.event.MatchPlayerDeathEvent;
 import tc.oc.pgm.goals.events.GoalCompleteEvent;
 import tc.oc.pgm.goals.events.GoalTouchEvent;
-import tc.oc.pgm.spawns.events.ParticipantDespawnEvent;
 import tc.oc.pgm.util.Audience;
 
 /**
@@ -223,9 +223,19 @@ public abstract class TouchableGoal<T extends ProximityGoalDefinition> extends P
   }
 
   @EventHandler(priority = EventPriority.MONITOR)
-  public void onPlayerDeath(ParticipantDespawnEvent event) {
+  public void onPlayerDeath(MatchPlayerDeathEvent event) {
     ParticipantState victim = event.getPlayer().getParticipantState();
-    if (victim != null) recentTouchingPlayers.remove(victim);
+    if (victim != null) {
+      Competitor competitor = victim.getParty();
+      this.touchingPlayers.remove(victim);
+      this.recentTouchingPlayers.remove(victim);
+
+      boolean flag = false;
+      for (ParticipantState player : this.touchingPlayers) {
+        if (player.getParty().equals(competitor)) flag = true;
+      }
+      if (!flag) this.touchingCompetitors.remove(competitor);
+    }
   }
 
   @EventHandler(priority = EventPriority.MONITOR)
