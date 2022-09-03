@@ -177,7 +177,7 @@ public abstract class TouchableGoal<T extends ProximityGoalDefinition> extends P
   }
 
   public boolean showEnemyTouches() {
-    return false;
+    return true;
   }
 
   public boolean shouldShowTouched(@Nullable Competitor team, Party viewer) {
